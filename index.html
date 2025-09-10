@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background-attachment: fixed;
+            color: #4a4a4a;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .gallery-container {
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .photo-group {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 180px;
+            transition: all 0.6s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .photo-group.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .photo-card {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
+
+        .photo-card:hover::before {
+            animation: shimmer 1.5s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .photo-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Position photo groups alternately on left and right */
+        .photo-group:nth-child(odd) {
+            left: 20px;
+        }
+
+        .photo-group:nth-child(even) {
+            right: 20px;
+        }
+
+        .photo-group:nth-child(1) { top: 100px; }
+        .photo-group:nth-child(2) { top: 400px; }
+        .photo-group:nth-child(3) { top: 800px; }
+        .photo-group:nth-child(4) { top: 1200px; }
+        .photo-group:nth-child(5) { top: 1600px; }
+        .photo-group:nth-child(6) { top: 2000px; }
+        .photo-group:nth-child(7) { top: 2400px; }
+        .photo-group:nth-child(8) { top: 2800px; }
+        .photo-group:nth-child(9) { top: 3200px; }
+        .photo-group:nth-child(10) { top: 3600px; }
+        .photo-group:nth-child(11) { top: 4000px; }
+        .photo-group:nth-child(12) { top: 4400px; }
+        .photo-group:nth-child(13) { top: 4800px; }
+        .photo-group:nth-child(14) { top: 5200px; }
+        .photo-group:nth-child(15) { top: 5600px; }
+        .photo-group:nth-child(16) { top: 6000px; }
+
+        /* Different gradient themes for photo cards */
+        .photo-group:nth-child(1) .photo-card { background: linear-gradient(45deg, #ff9a9e, #fecfef); }
+        .photo-group:nth-child(2) .photo-card { background: linear-gradient(45deg, #a8edea, #fed6e3); }
+        .photo-group:nth-child(3) .photo-card { background: linear-gradient(45deg, #ffd89b, #19547b); }
+        .photo-group:nth-child(4) .photo-card { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .photo-group:nth-child(5) .photo-card { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .photo-group:nth-child(6) .photo-card { background: linear-gradient(45deg, #4facfe, #00f2fe); }
+        .photo-group:nth-child(7) .photo-card { background: linear-gradient(45deg, #43e97b, #38f9d7); }
+        .photo-group:nth-child(8) .photo-card { background: linear-gradient(45deg, #fa709a, #fee140); }
+        .photo-group:nth-child(9) .photo-card { background: linear-gradient(45deg, #30cfd0, #91a7ff); }
+        .photo-group:nth-child(10) .photo-card { background: linear-gradient(45deg, #ff8a80, #ea4c89); }
+        .photo-group:nth-child(11) .photo-card { background: linear-gradient(45deg, #fdfbfb, #ebedee); }
+        .photo-group:nth-child(12) .photo-card { background: linear-gradient(45deg, #e0c3fc, #8ec5fc); }
+        .photo-group:nth-child(13) .photo-card { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .photo-group:nth-child(14) .photo-card { background: linear-gradient(45deg, #84fab0, #8fd3f4); }
+        .photo-group:nth-child(15) .photo-card { background: linear-gradient(45deg, #d299c2, #fef9d7); }
+        .photo-group:nth-child(16) .photo-card { background: linear-gradient(45deg, #a1c4fd, #c2e9fb); }
+
+        /* Center content space */
+        .center-content {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            max-width: 600px;
+            min-height: 2000px;
+            top: 150px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .content-placeholder {
+            width: 100%;
+            height: 100%;
+            border: 3px dashed #ff6b9d;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b9d;
+            font-size: 1.2em;
+            text-align: center;
+            background: rgba(255, 107, 157, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .content-placeholder:hover {
+            background: rgba(255, 107, 157, 0.1);
+            border-color: #d63384;
+        }
+
+        .placeholder-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .placeholder-text {
+            font-style: italic;
+            opacity: 0.8;
+            max-width: 400px;
+        }
+
+        /* Floating elements */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            color: rgba(255, 182, 193, 0.3);
+            font-size: 16px;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .photo-group {
+                width: 120px;
+            }
+            
+            .photo-card {
+                height: 140px;
+            }
+            
+            .photo-group:nth-child(odd) {
+                left: 5px;
+            }
+            
+            .photo-group:nth-child(even) {
+                right: 5px;
+            }
+            
+            .center-content {
+                width: calc(100vw - 250px);
+                max-width: none;
+                padding: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                margin: 0;
+                min-width: 200px;
+            }
+            
+            .placeholder-icon {
+                font-size: 2.2em;
+            }
+            
+            .content-placeholder {
+                font-size: 0.95em;
+                padding: 15px;
+            }
+            
+            .placeholder-text {
+                max-width: 100%;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .photo-group {
+                width: 100px;
+            }
+            
+            .photo-card {
+                height: 120px;
+            }
+            
+            .photo-group:nth-child(odd) {
+                left: 2px;
+            }
+            
+            .photo-group:nth-child(even) {
+                right: 2px;
+            }
+            
+            .center-content {
+                width: calc(100vw - 204px);
+                padding: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                margin: 0;
+                min-width: 180px;
+            }
+            
+            .placeholder-icon {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+            
+            .content-placeholder {
+                font-size: 0.85em;
+                padding: 12px;
+            }
+            
+            .placeholder-text {
+                max-width: 100%;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                line-height: 1.4;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .photo-group {
+                width: 85px;
+            }
+            
+            .photo-card {
+                height: 100px;
+            }
+            
+            .center-content {
+                width: calc(100vw - 174px);
+                padding: 12px;
+                min-width: 160px;
+            }
+            
+            .placeholder-icon {
+                font-size: 1.5em;
+                margin-bottom: 10px;
+            }
+            
+            .content-placeholder {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+
+         .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      z-index: 9999;
+      font-family: 'Courier New', monospace;
+
+      /* Transition for smooth fade */
+      opacity: 1;
+      transition: opacity 0.6s ease;
+    }
+
+    .overlay.fade-out {
+      opacity: 0;
+      pointer-events: none; /* Prevent blocking clicks after fade */
+    }
+    </style>
+</head>
+<body>
+    <div id="overlay" class="overlay">
+      YE SIRF TERE LIYE NITIKA💝💝<br>screen pe click karo maharani!! 🙇‍♀️
+  </div>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+    
+    <div class="gallery-container">
+        <!-- Photo Group 1 (Left Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_1.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_2.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+        <!-- Photo Group 2 (Right Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_3.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_4.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+        <!-- Photo Group 3 (Left Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_5.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_6.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+        <!-- Photo Group 4 (Right Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_7.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_8.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+        <!-- Photo Group 5 (Left Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_9.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_10.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+        <!-- Photo Group 6 (Right Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_11.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_12.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+        <!-- Photo Group 7 (Left Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_13.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_14.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+          <!-- Photo Group 8 (Right Side) -->
+        <div class="photo-group">
+            <div class="photo-card">
+                <img src="imgs/photo_15.jpg" class="photo-placeholder">
+            </div>
+            <div class="photo-card">
+                <img src="imgs/photo_16.jpg" class="photo-placeholder">
+            </div>
+        </div>
+
+         
+
+
+        
+        <!-- Center Content Space -->
+        <div class="center-content">
+            <div class="content-placeholder">
+                <div class="placeholder-icon">😘</div>
+                <div class="placeholder-text">
+                    MERI JAAN💝💝.<br><br>
+                    Finalllyyyyy ho gyaa ek sall hume😁😁,ye ek saal bohot kuch hua,bohot kuch naya bhi hua ,bohot bura bhi hua aur bohot acha bhi hua aur sabse imp ham iss sab me ek sath thee💝💝 . Tune muje ye pure time me bohot baar realise karaya he ki kitna lucky hu me Jo tu he mere paas jisse me har chiz bata saku, jo humesha mere sath khade rahe kuch bhi ho❤️❤️.tune tho jhagde bhi kiye honge mere liye ek do skl me 😂😂.muje tho ni chaiye teri jesi girlfriend sab ko mile kyuki sabko mile tho me flex kis pe marunga ki dheko meri maharani kitni pyari he 🥺🥺. Peheli baar itna sab likha he kisi ke liye pata he pheli baar koi itna special mila he na muje isliye, aur tu tho humesha rahegi hi mere liye special🎁(meri Kohinoor)wese Kohinoor tere jesa dhikta tho ladne chale jata me tuje wapis lane ke liye🙈🙈pr tere samne wo bhi kya hi hai🙇‍♂️, uske tere jitne nakhre bhi ni he pr😝😝, wo sundar bhi ni he tere jitna pr haa🤩🤩, pata he abhi na muje baas chaiye ki tu bade ho , sucessful ban me bhi banu taki aaram se rehe sake hum ek sath🤝 Kaash ho jaye eesa🤞🤞 pr hoga na tho dhekna rani jesa rakhunga tuje ekdum👸,aur tuje ye isliye bol raha hu kyuki muje koi bole tho muje bhi acha lagega kii, jaan me humesha tere sath hu, tu meri hi meri hi rahegi,tu galte kare samjhaunga bhi me hi aur me galti karu tho daat bhi tere se hi khaunga, yrr I love you bee sahi me thank you muje itna sab feel karane ke liye ye ek saal sahi me life ka sabse best ek saal hoga mere aage Jake bhi ye sab yaad rahega, pr sabse imp tu bhi yaad rahegi 😌😌maane tu hogi tab bhi mere sath le tu bhavna samjh baas✋✋bohot tang Krna muje me bhi krunga , weseee kabhi tune pucha na ki tu caterpillar hoti tho bhi pyaar krta kya me tujhse me tho na bol dunga mu pe sidha sidha theek he 🥱, aur ek chizz tera skincare kuch jyada hi acha he pata he kyuki roj tu jyada Sundar lagne lagi he muje, do teen ke break ke baad dhekta hu tho lagta he konsi Rajkumari ke sath pyaar kr baitha hu 🤭🤭,tu tho rahegi hi meri nituu,shona,jaanu,bubu,baby,Rajkumari, maharani,yedi,gandu,gadhi, bakasur, mandbhudhi aurr dukkar😘😘aur me Tera tutu😎😎. Tu paas hoti na din ki sau kissi tho mil jati tuje aaram se baas eese baithi ho tho kissi , kaam kr rahi ho kissi , kissi de de ke tang kr deta tuje😝😝,pata he kabhi kabhi na me humare purane chats padhta hu tho na itna sahi wala evolution dhekne milta he na pehele me itna comfortable ni tha pr abhi mast ho gya hu tho pehele ke chats ko dhek ke lagta he ki jhagda ho gya he humara itne sukhe lagte he ab😂pr sahi hi hai muje ek saal phele koi bolta ki tu ek saal baad ❤️❤️apni girlfriend ❤️❤️ ko I love you meri bubu bol raha hoga tho me bhi ni maanta 😅😅 pr ab jesa he wesa ho gyaa🤭. Thank you Jaan humesha mere sath rehene ke liye thank youu muje apna boyfriend banane ke liye jaanu aur end me sahi meee bohot pyaar karta hu tujhse yr😭
+Chal eng me bol deta hu abb(mera fav part)
+I love you meri januuuuuu💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝💝
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating hearts
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.innerHTML = '♥';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 15 + 15) + 's';
+            heart.style.fontSize = (Math.random() * 8 + 12) + 'px';
+            
+            document.getElementById('floatingHearts').appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 25000);
+        }
+
+        // Create hearts periodically
+        setInterval(createFloatingHeart, 4000);
+
+        // Animate photo groups on scroll
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all photo groups
+        document.querySelectorAll('.photo-group').forEach(group => {
+            observer.observe(group);
+        });
+
+        // Add click effect to photo cards
+        document.querySelectorAll('.photo-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'translateY(-10px) scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-10px) scale(1.05)';
+                }, 200);
+            });
+        });
+
+        // Initialize with some floating hearts
+        for (let i = 0; i < 5; i++) {
+            setTimeout(createFloatingHeart, i * 1000);
+        }
+
+        // Add parallax effect to photo groups
+        let ticking = false;
+
+        function updateParallax() {
+            const scrollY = window.pageYOffset;
+            const photoGroups = document.querySelectorAll('.photo-group');
+            
+            photoGroups.forEach((group, index) => {
+                const speed = 0.05 + (index % 3) * 0.02;
+                const yPos = scrollY * speed;
+                group.style.transform = `translateY(${yPos}px)`;
+            });
+            
+            ticking = false;
+        }
+
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }
+
+        const overlay = document.getElementById("overlay");
+
+    document.addEventListener("click", () => {
+      overlay.classList.add("fade-out");
+      // Optional: completely remove after animation ends
+      overlay.addEventListener("transitionend", () => {
+        overlay.remove();
+      });
+    });
+
+        window.addEventListener('scroll', requestTick);
+    </script>
+</body>
+</html>
